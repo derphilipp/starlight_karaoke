@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Starlight Karaoke Song List</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <!-- <link rel="stylesheet" href="css/main.css"/> -->
+</head>
+<body>
+<h1>Starlight Karaoke Song List</h1>
+<table id="songTable" class="display">
+    <thead>
+        <tr>
+            <th>Artist</th>
+            <th>Songtitle</th>
+        </tr>
+    </thead>
+    <tbody>
+		<tr>
+			<td>Artist 1</td>
+			<td>Song 1</td>
+		</tr>
+		<tr>
+			<td>Artist 2</td>
+			<td>Song 2</td>
+		</tr>
+    </tbody>
+</table>
+
+</body>
+</html>
+
+<script src="jquery-3.4.1.min.js" integrity="sha512-bnIvzh6FU75ZKxp0GXLH9bewza/OIw6dLVh9ICg0gogclmYGguQJWl8U30WpbsGTqbIiAwxTsbe76DErLq5EDQ==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+
+<script>
+$(document).ready( function () {
+    $('#songTable').DataTable(
+        {
+            "ajax":"./songlist.json",
+            "pageLength": 100,
+            "lengthMenu": [ 25, 50, 100, 250, 500, 1000 ]
+        }
+
+    );
+    } );
+
+</script>
