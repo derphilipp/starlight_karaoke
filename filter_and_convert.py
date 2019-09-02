@@ -9,10 +9,20 @@ import re
 import sys
 
 
+def uppercaseit(text):
+    return text[0].upper() + text[1:]
+
+
+def put_the_back(text):
+    if text.startswith("The "):
+        return text[4:]+", The"
+    return text
+
+
 class Song():
     def __init__(self, artist, title):
-        self.artist = artist[0].upper() + artist[1:]
-        self.title = title[0].upper() + title[1:]
+        self.artist = put_the_back(uppercaseit(artist))
+        self.title = uppercaseit(title)
 
     def __lt__(self, other):
         return (self.artist.upper(), self.title.upper()) < (other.artist.upper(), other.title.upper())
@@ -53,7 +63,7 @@ x = open(filename)
 for line in x:
     everything.append(str.strip(line))
 
-elements = []
+songs = set()
 
 i = 0
 for e in everything:
@@ -74,16 +84,17 @@ for e in everything:
             if is_keyword(artist):
                 continue
 
-            elements.append(Song(artist, title))
+            songs.add(Song(artist, title))
 
-elements.sort()
+
+songlist = list(songs)
+songlist.sort()
 print('{ "data": [')
 first = True
-for song in elements:
+for song in songlist:
     if first:
         print(f"{song.json()}")
         first = False
     else:
         print(f",{song.json()}")
-
 print(']}')
