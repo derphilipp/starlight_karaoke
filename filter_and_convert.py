@@ -8,9 +8,12 @@ import operator
 import re
 import sys
 
-
 def uppercaseit(text):
     return text[0].upper() + text[1:]
+
+
+def strip_media_filenames(text):
+    return re.sub('(\.mpg|\.mp3)$', '', text,flags=re.I)
 
 
 def put_the_back(text):
@@ -18,24 +21,37 @@ def put_the_back(text):
         return text[4:]+", The"
     return text
 
+def strip_numbers_in_brackets(text):
+    return re.sub('\([0-9]\){1,2}', '', text)
+
+
+def minimize(text):
+    result = re.sub('\(.*\)', '', text)
+    result = re.sub('[^A-Za-z0-9]+', '', result).lower()
+    return result
+
 
 class Song():
     def __init__(self, artist, title):
-        self.artist = put_the_back(uppercaseit(artist))
-        self.title = uppercaseit(title)
+        self.artist = strip_numbers_in_brackets(put_the_back(strip_media_filenames(uppercaseit(artist))))
+        self.title = strip_numbers_in_brackets(strip_media_filenames(uppercaseit(title)))
+        self.min_artist = minimize(self.artist)
+        self.min_title = minimize(self.title)
+        self.comp = self.min_artist+"-"+ self.min_title
 
     def __lt__(self, other):
-        return (self.artist.upper(), self.title.upper()) < (other.artist.upper(), other.title.upper())
-
-    def csv(self):
-        a = self.artist.replace(";", ",")
-        b = self.title.replace(";", ",")
-        return f"{a};{b}"
+        return (self.min_artist, self.min_title) < (other.min_artist, other.min_title)
 
     def json(self):
         a = self.artist.replace("\"", "'")
         b = self.title.replace("\"", "'")
         return f'["{a}", "{b}"]'
+
+    def __eq__(self, other):
+        return self.comp == other.comp
+
+    def __hash__(self):
+        return hash(self.comp)
 
 
 def is_only_numbers(txt):
@@ -83,8 +99,14 @@ for e in everything:
                 continue
             if is_keyword(artist):
                 continue
+            amount_of_songs_before = len(songs)
+            newsong = Song(artist, title)
+            songs.add(newsong)
+            amount_of_songs_after = len(songs)
 
-            songs.add(Song(artist, title))
+            if amount_of_songs_before == amount_of_songs_after:
+                print(f"Skipped {newsong.artist} - {newsong.title} - {newsong.comp}", file=sys.stderr)
+            amount_of_songs_before = amount_of_songs_after
 
 
 songlist = list(songs)
